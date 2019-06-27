@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+repo="research-coi"
+issue=$1
+description=$2
+branch_name="$issue-$description"
+new_issue_branch $repo $issue $description

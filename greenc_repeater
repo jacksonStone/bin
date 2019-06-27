@@ -1,0 +1,86 @@
+#!/usr/bin/env node
+console.log("Running Green-Commit repeater")
+const { spawn, spawnSync } = require('child_process');
+const runGreencForBoth = ()=>{
+  const { stdout: coiMaster } = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+    cwd: '/Users/jacksonstone/kuali/repos/research-coi',
+    shell: "/bin/zsh"
+  })
+  const currentBranchCOI = coiMaster.toString()
+  if (currentBranchCOI.indexOf('master') !== -1) {
+    console.log("COI: MASTER BRANCH - skipping...")
+  } else {
+    checkCOIForChanges()
+  }
+
+
+  
+  const { stdout: protocolsMaster } = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+    cwd: '/Users/jacksonstone/kuali/repos/research-protocol',
+    shell: "/bin/zsh"
+  })
+  const currentBranchProtocols = protocolsMaster.toString()
+  
+  if (currentBranchProtocols.indexOf('master') !== -1) {
+    console.log("Protocol: MASTER BRANCH - skipping...")
+  } else {
+    checkProtocolsForChanges()
+  }
+}
+
+
+function checkCOIForChanges() {
+  const diffResponseForCOI = spawnSync('git', ['diff'], {
+    cwd: '/Users/jacksonstone/kuali/repos/research-coi',
+    shell: "/bin/zsh"
+  })
+  //Has changes
+  if (diffResponseForCOI.stdout.toString().length) {
+    spawn('source ~/.zshrc && npm run quick_test '+
+    '&& (git commit -am "_TESTS PASSED COMMIT_" && squash_greenc && echo "Saved COI..." || echo "COI Unchanged...")', 
+    {
+      stdio: 'inherit',
+      shell: "/bin/zsh",
+      cwd: "/Users/jacksonstone/kuali/repos/research-coi"
+    }).on('close', (code) => {
+      if(code >= 1) {
+        //Beep beep beep
+        setTimeout(()=>process.stdout.write('\x07'), 0)
+        setTimeout(()=>process.stdout.write('\x07'), 200)
+        setTimeout(()=>process.stdout.write('\x07'), 400)
+      }
+    });
+  }
+  else {
+    console.log("COI: UNCHANGED - skipping...")
+  }
+}
+
+function checkProtocolsForChanges(){
+
+  const diffResponseForProtocols = spawnSync('git', ['diff'], {
+    cwd: '/Users/jacksonstone/kuali/repos/research-protocol',
+    shell: "/bin/zsh"
+  })
+  if (diffResponseForProtocols.stdout.toString().length) {
+    spawn('source ~/.zshrc && npm run quick_test '+
+    '&& (git commit -am "_TESTS PASSED COMMIT_" && squash_greenc && echo "Saved Protocols..." || echo "Protocols Unchanged...")', 
+    {
+      stdio: 'inherit',
+      shell: "/bin/zsh",
+      cwd: "/Users/jacksonstone/kuali/repos/research-protocol"
+    }).on('close', (code) => {
+      if(code >= 1) {
+        //Beep beep beep
+        setTimeout(()=>process.stdout.write('\x07'), 0)
+        setTimeout(()=>process.stdout.write('\x07'), 200)
+        setTimeout(()=>process.stdout.write('\x07'), 400)
+      }
+    });
+  }
+  else {
+    console.log("Protocol: UNCHANGED - skipping...")
+  }
+}
+setInterval(runGreencForBoth, 1000*60*3)
+runGreencForBoth()

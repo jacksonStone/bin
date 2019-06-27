@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+const { spawnSync } = require('child_process');
+
+//Get current branch
+const { stdout, stderr, error } = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+  cwd: process.cwd(),
+  shell: "/bin/zsh"
+})
+const current_branch = stdout.toString()
+const logRes = spawnSync('git', [ 'log', `master..${current_branch}`], {
+  cwd: process.cwd(),
+  shell: "/bin/zsh"
+})
+
+const logResString = logRes.stdout.toString()
+const parts = logResString.split('_TESTS PASSED COMMIT_')
+
+//Only have more than one _TESTS PASSED COMMIT_
+if (parts.length > 2) {
+  //Fuse all _TESTS PASSED COMMIT_ together
+  spawnSync('git', [ 'reset', '--soft', `HEAD~${parts.length - 1}`], {
+    cwd: process.cwd(),
+    shell: "/bin/zsh" 
+  })
+  spawnSync('git', [ 'commit', '-a', '-m', '"_TESTS PASSED COMMIT_"'], {
+    cwd: process.cwd(),
+    shell: "/bin/zsh" 
+  })
+}

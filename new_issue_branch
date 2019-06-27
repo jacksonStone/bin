@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+repo=$1
+issue=$2
+description=$3
+branch_name="$issue-$description"
+
+cd /Users/jacksonstone/kuali/repos/$repo
+git checkout master && git pull
+git branch $branch_name
+git checkout $branch_name
+
+git commit --allow-empty -m "$issue"
+git push --set-upstream origin $branch_name --no-verify
