@@ -4,7 +4,7 @@ issue=$2
 description=$3
 branch_name="$issue-$description"
 
-cd /Users/jacksonstone/kuali/repos/$repo
+cd $repo
 git checkout master && git pull
 git branch $branch_name
 git checkout $branch_name
