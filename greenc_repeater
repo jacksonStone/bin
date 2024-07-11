@@ -24,7 +24,7 @@ function checkRepoForChanges() {
   //Has changes
   if (diffResponseForBranch.stdout.toString().length) {
     spawn('source ~/.zshrc && npm run quick_test '+
-    '&& (git commit -am "_TESTS PASSED COMMIT_" && squash_greenc && echo "Saved COI..." || echo "COI Unchanged...")', 
+    '&& (git commit -am "_TESTS PASSED COMMIT_" && squash_greenc && echo "Saved Repo..." || echo "Repo Unchanged...")', 
     {
       stdio: 'inherit',
       shell: "/bin/zsh",
